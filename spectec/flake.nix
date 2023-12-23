@@ -26,10 +26,6 @@
 
       devShells.${system}.default = pkgs.mkShell rec {
         buildInputs = ocamlLib ++ ocamlBuildTools;
-
-        shellHook = ''
-          zsh
-        '';
       };
     };
 }
