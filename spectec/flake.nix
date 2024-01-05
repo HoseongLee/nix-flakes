@@ -8,15 +8,23 @@
       system = "x86_64-linux";
       pkgs = import nixpkgs { inherit system; };
 
+      pythonLib = with pkgs; [
+        (python311.withPackages (ps: with ps; [six]))
+      ];
+
       ocamlLib = with pkgs.ocaml-ng.ocamlPackages_5_0; [
         ocaml
 
         findlib
         mdx
         menhir
+
+        ocaml-lsp
+        ocamlformat
       ];
 
       ocamlBuildTools = with pkgs; [
+        opam
         dune_3
         sphinx
       ];
@@ -24,8 +32,12 @@
     {
       formatter.${system} = pkgs.nixpkgs-fmt;
 
+      packages.${system}.default = pkgs.writeScriptBin "test-simd" ''
+        ./watsup spec/wasm-3.0/*.watsup --animate --sideconditions --interpreter --test-interpreter simd 2> /dev/null
+      '';
+
       devShells.${system}.default = pkgs.mkShell rec {
-        buildInputs = ocamlLib ++ ocamlBuildTools;
+        buildInputs = pythonLib ++ ocamlLib ++ ocamlBuildTools;
       };
     };
 }
