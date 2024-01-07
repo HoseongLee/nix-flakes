@@ -8,6 +8,24 @@
       system = "x86_64-linux";
       pkgs = import nixpkgs { inherit system; };
 
+      connect = pkgs.writeScriptBin "connect" ''
+        gio mount smb://192.168.0.1/hdd1
+      '';
+
+      sync-to = pkgs.writeScriptBin "sync-to" ''
+        rsync -rvzP --no-p --delete --exclude={'.git','.github','.direnv','flake.*','**/*~','**/*.pyc','**/_build','**/_output','*.swp','.envrc'} . '/run/user/1000/gvfs/smb-share:server=192.168.0.1,share=hdd1/sync'
+      '';
+
+      sync-from = pkgs.writeScriptBin "sync-from" ''
+        rsync -rvzP --no-p --exclude={'.git','.github','.direnv','flake.*','**/*~','**/*.pyc','**/_build','**/_output','*.swp','.envrc'} '/run/user/1000/gvfs/smb-share:server=192.168.0.1,share=hdd1/sync' .
+      '';
+
+      sync-tools = [
+        connect
+        sync-to
+        sync-from
+      ];
+
       pythonLib = with pkgs; [
         (python311.withPackages (ps: with ps; [six]))
       ];
@@ -37,7 +55,7 @@
       '';
 
       devShells.${system}.default = pkgs.mkShell rec {
-        buildInputs = pythonLib ++ ocamlLib ++ ocamlBuildTools;
+        buildInputs = sync-tools ++ pythonLib ++ ocamlLib ++ ocamlBuildTools;
       };
     };
 }
