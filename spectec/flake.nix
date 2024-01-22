@@ -36,12 +36,14 @@
         findlib
         mdx
         menhir
+        menhirLib
 
         ocaml-lsp
-        ocamlformat
       ];
 
       ocamlBuildTools = with pkgs; [
+        wabt
+
         opam
         dune_3
         sphinx
