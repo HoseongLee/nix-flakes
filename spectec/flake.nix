@@ -13,11 +13,11 @@
       '';
 
       sync-to = pkgs.writeScriptBin "sync-to" ''
-        rsync -rvzP --no-p --delete --exclude={'.git','.github','.direnv','flake.*','**/*~','**/*.pyc','**/_build','**/_output','*.swp','.envrc'} . '/run/user/1000/gvfs/smb-share:server=192.168.0.1,share=hdd1/sync'
+        rsync -rvzP --no-p --delete --exclude={'.git','.github','.direnv','flake.*','**/*~','**/*.pyc','**/_build','**/_output','*.swp','.envrc'} . '/run/user/1000/gvfs/smb-share:server=192.168.0.1,share=hdd1/sync/west'
       '';
 
       sync-from = pkgs.writeScriptBin "sync-from" ''
-        rsync -rvzP --no-p --exclude={'.git','.github','.direnv','flake.*','**/*~','**/*.pyc','**/_build','**/_output','*.swp','.envrc'} '/run/user/1000/gvfs/smb-share:server=192.168.0.1,share=hdd1/sync' .
+        rsync -rvzP --no-p --exclude={'.git','.github','.direnv','flake.*','**/*~','**/*.pyc','**/_build','**/_output','*.swp','.envrc'} '/run/user/1000/gvfs/smb-share:server=192.168.0.1,share=hdd1/sync/west' .
       '';
 
       sync-tools = [
@@ -48,6 +48,10 @@
         dune_3
         sphinx
       ];
+
+      libs = with pkgs; [
+        zlib
+      ];
     in
     {
       formatter.${system} = pkgs.nixpkgs-fmt;
@@ -58,6 +62,8 @@
 
       devShells.${system}.default = pkgs.mkShell rec {
         buildInputs = sync-tools ++ pythonLib ++ ocamlLib ++ ocamlBuildTools;
+
+        LD_LIBRARY_PATH = "${pkgs.stdenv.cc.cc.lib.outPath}/lib:${pkgs.lib.makeLibraryPath libs}";
       };
     };
 }
