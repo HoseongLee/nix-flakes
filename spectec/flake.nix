@@ -32,6 +32,7 @@
 
       ocamlLib = with pkgs.ocaml-ng.ocamlPackages_5_0; [
         ocaml
+        ocamlbuild
 
         findlib
         mdx
@@ -39,10 +40,12 @@
         menhirLib
 
         ocaml-lsp
+        ocamlformat
       ];
 
       ocamlBuildTools = with pkgs; [
         wabt
+        wasm-tools
 
         opam
         dune_3
