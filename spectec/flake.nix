@@ -37,6 +37,7 @@
         findlib
         mdx
         menhir
+        zarith
         menhirLib
 
         ocaml-lsp
