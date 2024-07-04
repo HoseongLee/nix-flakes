@@ -9,7 +9,7 @@
       pkgs = import nixpkgs { inherit system; };
 
       pythonLib = with pkgs; [
-        (python310.withPackages (ps: with ps; [ ]))
+        (python310.withPackages (ps: with ps; [ black line-profiler ]))
       ];
     in
     {
